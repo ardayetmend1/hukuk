@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Collapse, ConfigProvider, Drawer, Modal } from "antd";
 import trTR from "antd/es/locale/tr_TR";
 import {
@@ -9,21 +7,20 @@ import {
   ArrowUpOutlined,
   CloseOutlined,
   CompassOutlined,
-  EnvironmentOutlined,
   EyeOutlined,
-  MailOutlined,
   MenuOutlined,
   MinusOutlined,
-  PhoneOutlined,
   PlusOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
-import { siteContent as content } from "./site-content";
+import { siteContent as content } from "./content";
+import { GlowingButton } from "./components/ui/glowing-button";
+import ContactSection from "./components/ContactSection";
 
 const links = [
-  { id: "hakkimizda", label: "Hakkımızda" },
-  { id: "hizmetlerimiz", label: "Hizmetlerimiz" },
-  { id: "ekibimiz", label: "Ekibimiz" },
+  { id: "hakkimizda", label: "Hakkımızda", glowColor: '#b79258' },
+  { id: "hizmetlerimiz", label: "Hizmetlerimiz", glowColor: '#a47b65' },
+  { id: "ekibimiz", label: "Ekibimiz", glowColor: '#9b5360' },
 ];
 
 function DiagonalArrow() {
@@ -32,12 +29,38 @@ function DiagonalArrow() {
   );
 }
 
-export default function Home() {
+export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<
-    (typeof content.team)[number] | null
-  >(null);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [activeSection, setActiveSection] = useState("");
+  const principleRef = useRef(null);
+  const [principlesVisible, setPrinciplesVisible] = useState(false);
+  const servicesRef = useRef(null);
+  const [visibleServices, setVisibleServices] = useState(() => new Set());
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const index = Number(entry.target.dataset.serviceStep);
+        setVisibleServices((previous) => new Set([...previous, index]));
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.35, rootMargin: '0px 0px -8% 0px' });
+    servicesRef.current?.querySelectorAll('[data-service-step]').forEach((step) => observer.observe(step));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setPrinciplesVisible(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.35 });
+    if (principleRef.current) observer.observe(principleRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -75,6 +98,7 @@ export default function Home() {
         İçeriğe geç
       </a>
       <header className="site-header">
+        <span className="header-details" aria-hidden="true" />
         <a
           className="brand"
           href="#anasayfa"
@@ -89,19 +113,20 @@ export default function Home() {
         </a>
         <nav aria-label="Ana menü">
           {links.map((link) => (
-            <a
+            <GlowingButton
               key={link.id}
               href={`#${link.id}`}
+              glowColor={link.glowColor}
               aria-current={activeSection === link.id ? "location" : undefined}
             >
               {link.label}
-            </a>
+            </GlowingButton>
           ))}
         </nav>
         <div className="header-actions">
-          <a className="header-contact" href="#iletisim">
+          <GlowingButton className="header-contact" href="#iletisim" variant="solid" glowColor="#c6a478" aria-current={activeSection === 'iletisim' ? 'location' : undefined}>
             İletişime geçin <DiagonalArrow />
-          </a>
+          </GlowingButton>
           <button
             className="menu-toggle"
             aria-label="Menüyü aç"
@@ -129,15 +154,18 @@ export default function Home() {
         <nav id="mobile-menu" className="mobile-nav" aria-label="Mobil menü">
           {[...links, { id: "iletisim", label: "İletişim" }].map(
             (link, index) => (
-              <a
+              <GlowingButton
                 key={link.id}
                 href={`#${link.id}`}
+                glowColor={link.glowColor || '#c6a478'}
+                variant={link.id === 'iletisim' ? 'solid' : 'soft'}
+                aria-current={activeSection === link.id ? 'location' : undefined}
                 onClick={() => setMenuOpen(false)}
               >
                 <span>0{index + 1}</span>
                 {link.label}
                 <DiagonalArrow />
-              </a>
+              </GlowingButton>
             ),
           )}
         </nav>
@@ -169,14 +197,6 @@ export default function Home() {
               <br />
               {content.hero.description[1]}
             </p>
-            <div className="hero-actions">
-              <a className="button primary" href="#hizmetlerimiz">
-                Hizmetlerimizi keşfedin <DiagonalArrow />
-              </a>
-              <a className="text-link" href="#hakkimizda">
-                Bizi tanıyın <ArrowRightOutlined aria-hidden />
-              </a>
-            </div>
           </div>
           <div className="hero-bottom">
             <a href="#hakkimizda">
@@ -215,19 +235,14 @@ export default function Home() {
           <div className="about-visual">
             <div className="about-photo">
               <img
-                src="/images/architecture-detail.jpg"
-                alt="Gün ışığıyla aydınlanan sade mimari ve taş merdiven"
-                width="1000"
-                height="1500"
+                src="/images/about-desk.jpg"
+                alt="Doğal ışık alan ahşap çalışma masasında defter ve dolma kalem"
+                width="1400"
+                height="2100"
                 loading="lazy"
               />
             </div>
-            <div className="image-seal">
-              <span>ARLAS LEGAL</span>
-              <span className="seal-symbol">§</span>
-              <span>GÜVENLE, BİRLİKTE.</span>
-            </div>
-            <span className="image-caption">SAĞLAM TEMELLER ÜZERİNE.</span>
+            <span className="image-caption">DİKKATLE DİNLER. ÖZENLE ÇALIŞIRIZ.</span>
           </div>
           <div className="about-copy">
             <p className="eyebrow">01 — HAKKIMIZDA</p>
@@ -237,20 +252,23 @@ export default function Home() {
               <em>sonra yol çizeriz.</em>
             </h2>
             <p className="body-copy">{content.about}</p>
-            <div className="about-principle">
-              <span>01</span>
-              <div>
-                <h3>Her dosyaya aynı özen.</h3>
-                <p>Detayları önemser, süreci birlikte takip ederiz.</p>
-              </div>
-            </div>
-            <div className="about-principle">
-              <span>02</span>
-              <div>
-                <h3>Her adımda açık iletişim.</h3>
-                <p>Hukuku anlaşılır kılar, sizi haberdar ederiz.</p>
-              </div>
-            </div>
+            <ol ref={principleRef} className={`about-timeline${principlesVisible ? ' is-visible' : ''}`} aria-label="Çalışma yaklaşımımız">
+              <li className="about-principle">
+                <span className="principle-track" aria-hidden="true"><span /></span>
+                <span className="principle-number" aria-hidden="true">01</span>
+                <div>
+                  <h3>Her dosyaya aynı özen.</h3>
+                  <p>Detayları önemser, süreci birlikte takip ederiz.</p>
+                </div>
+              </li>
+              <li className="about-principle">
+                <span className="principle-number" aria-hidden="true">02</span>
+                <div>
+                  <h3>Her adımda açık iletişim.</h3>
+                  <p>Hukuku anlaşılır kılar, sizi haberdar ederiz.</p>
+                </div>
+              </li>
+            </ol>
             <a className="text-link underlined" href="#ekibimiz">
               Ekibimizle tanışın <DiagonalArrow />
             </a>
@@ -274,9 +292,15 @@ export default function Home() {
               <br className="desktop-break" /> bütüncül bir hukuki bakış.
             </p>
             <span className="services-decoration" aria-hidden>
-              §
+              <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                <path d="M60 17v84M38 103h44M48 97h24M22 38l38-9 38 9" />
+                <circle cx="60" cy="15" r="4" />
+                <path d="M8 73l14-35 14 35M84 73l14-35 14 35" />
+                <path d="M8 73h28a14 14 0 0 1-28 0ZM84 73h28a14 14 0 0 1-28 0Z" fill="currentColor" fillOpacity="0.07" />
+              </svg>
             </span>
           </div>
+          <div className="services-timeline" ref={servicesRef}>
           <Collapse
             className="services-list"
             accordion
@@ -287,8 +311,9 @@ export default function Home() {
             }
             items={content.services.map((service, index) => ({
               key: String(index),
+              className: visibleServices.has(index) ? 'service-reached' : '',
               label: (
-                <span className="service-heading">
+                <span className="service-heading" data-service-step={index}>
                   <span className="service-number">0{index + 1}</span>
                   <span>
                     <strong>{service.title}</strong>
@@ -306,6 +331,7 @@ export default function Home() {
               ),
             }))}
           />
+          </div>
         </section>
 
         <section
@@ -369,101 +395,7 @@ export default function Home() {
           )}
         </section>
 
-        <section className="statement-section" aria-label="Yaklaşımımız">
-          <span className="statement-mark" aria-hidden>
-            “
-          </span>
-          <p>
-            Güven, doğru atılan
-            <br />
-            <em>her adımda büyür.</em>
-          </p>
-          <span className="statement-signature">ARLAS LEGAL</span>
-          <div className="statement-lines" aria-hidden />
-        </section>
-
-        <section
-          id="iletisim"
-          className="section contact-section"
-          aria-labelledby="contact-title"
-        >
-          <div className="contact-intro">
-            <p className="eyebrow">04 — İLETİŞİM</p>
-            <h2 id="contact-title">
-              Bir görüşmeyle
-              <br />
-              <em>başlayalım.</em>
-            </h2>
-            <p className="body-copy">
-              Sizi dinlemek, birlikte bir yol çizmenin
-              <br />
-              ilk adımı.
-            </p>
-            {content.contact.email && (
-              <a
-                className="button primary"
-                href={`mailto:${content.contact.email}`}
-              >
-                Bize yazın <DiagonalArrow />
-              </a>
-            )}
-          </div>
-          <div className="contact-details">
-            <div className="contact-item">
-              <EnvironmentOutlined aria-hidden />
-              <div>
-                <h3>Ofisimiz</h3>
-                {content.contact.address ? (
-                  content.contact.mapUrl ? (
-                    <a
-                      href={content.contact.mapUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {content.contact.address} <DiagonalArrow />
-                    </a>
-                  ) : (
-                    <p>{content.contact.address}</p>
-                  )
-                ) : (
-                  <p>Adres bilgisi yakında burada.</p>
-                )}
-              </div>
-            </div>
-            <div className="contact-item">
-              <MailOutlined aria-hidden />
-              <div>
-                <h3>E-posta</h3>
-                {content.contact.email ? (
-                  <a href={`mailto:${content.contact.email}`}>
-                    {content.contact.email}
-                  </a>
-                ) : (
-                  <p>E-posta bilgisi yakında burada.</p>
-                )}
-              </div>
-            </div>
-            <div className="contact-item">
-              <PhoneOutlined aria-hidden />
-              <div>
-                <h3>Telefon</h3>
-                {content.contact.phone ? (
-                  <a
-                    href={`tel:${content.contact.phone.replace(/[^+\d]/g, "")}`}
-                  >
-                    {content.contact.phone}
-                  </a>
-                ) : (
-                  <p>Telefon bilgisi yakında burada.</p>
-                )}
-              </div>
-            </div>
-            <p className="contact-note">
-              {content.contact.hours ||
-                "Yeni ofisimizin iletişim bilgilerini çok yakında paylaşacağız."}
-            </p>
-          </div>
-        </section>
+        <ContactSection />
       </main>
 
       <footer className="site-footer">

@@ -59,7 +59,7 @@ export const siteContent = {
       role: "Kurucu Avukat",
       focus: "Şirketler & Ticaret Hukuku",
       bio: "Ticari ilişkileri bütüncül bir bakışla değerlendirir. Açık iletişimi ve her dosyaya özgü, titiz bir çalışma yaklaşımını benimser.",
-      image: null as string | null,
+      image: null,
     },
     {
       name: "Av. Selin Kaya",
@@ -67,15 +67,15 @@ export const siteContent = {
       role: "Avukat",
       focus: "Sözleşmeler & Uyuşmazlık Çözümü",
       bio: "Sözleşme ilişkileri ve uyuşmazlık süreçlerinde çalışır. İhtiyaçları dikkatle dinlemeye ve sürecin her aşamasını anlaşılır kılmaya önem verir.",
-      image: null as string | null,
+      image: null,
     },
   ],
   // Null values render honest placeholders. Set actual values to enable direct links.
   contact: {
-    email: null as string | null,
-    phone: null as string | null,
-    address: null as string | null,
-    mapUrl: null as string | null,
-    hours: null as string | null,
+    email: null,
+    phone: null,
+    address: null,
+    mapUrl: null,
+    hours: null,
   },
 };

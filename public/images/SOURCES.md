@@ -1,5 +1,7 @@
 # Görsel kaynakları
 
+- Güncel hakkımızda fotoğrafı: Kelly Sikkema / [Unsplash — notebook and pen](https://unsplash.com/photos/ChsnZBAX6wA). Kaynak: `https://images.unsplash.com/photo-1642543492366-a92039433543`. Yerel dosya: `public/images/about-desk.jpg`. Temsili çalışma masası detayıdır.
+
 - Hero: [Unsplash — white concrete building with white walls](https://unsplash.com/photos/white-concrete-building-with-white-walls-aGhIL08DcSc). Kaynak: `https://images.unsplash.com/photo-1583279872204-4e69025e2b39`. Yerel dosya: `public/images/architecture.jpg`.
 - Hakkımızda: [Unsplash — beige interior collection](https://unsplash.com/s/photos/beige-interior). Kaynak: `https://images.unsplash.com/photo-1601993957728-1e56ab70c5a8`. Yerel dosya: `public/images/architecture-detail.jpg`.
 - Mimari fotoğraflar görsel atmosfer için kullanılır; Arlas Legal'in gerçek ofis fotoğrafları değildir.
