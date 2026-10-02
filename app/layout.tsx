@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
-  metadataBase: new URL("https://arlas-legal.dapper-smile-5399.chatgpt.site"),
+  metadataBase: new URL("https://arlas-legal.arda-yetmen.chatgpt.site"),
   title: "Arlas Legal | Hukuk & Danışmanlık",
   description:
     "Sağlam bir temel. Güvenli bir gelecek. Arlas Legal ile bireyler ve kurumlar için özenli bir hukuki yaklaşım.",
